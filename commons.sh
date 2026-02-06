@@ -1,8 +1,8 @@
 #!/bin/bash
 USERID=$(id -u)
 
-LOGS_FOLDER="/var/log/shell-roboshop"
-LOGS_FILE="/var/log/shell-roboshop/$0.log"
+LOGS_FOLDER="/var/log/shell-roboshop-commons-"
+LOGS_FILE="/var/log/shell-roboshop-commons-/$0.log"
 SCRIPT_DIR=$PWD
 
 
