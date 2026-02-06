@@ -134,7 +134,7 @@ MONGODB_SETUP(){
         dnf install mongodb-org -y &>> $LOGS_FILE
         VALIDATE $? "Installing mongoDB server" 
     else
-        echo "mongoDB is already installed $Y SKIPPED $N"
+        echo -e "mongoDB is already installed $Y SKIPPED $N"
     fi
 }
 
