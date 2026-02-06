@@ -28,3 +28,5 @@ else
 fi
 
 SERVICE_RESTART_SETUP
+
+END_TIMER()
