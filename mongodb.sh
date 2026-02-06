@@ -1,5 +1,5 @@
 source ./commons.sh
-ROOT_ACESS
+ROOT_ACCESS
 START_TIMER
 
 cp mongo.repo /etc/yum.repos.d/

@@ -129,7 +129,7 @@ COPYING_SERVICE(){
 }
 
 MONGODB_SETUP(){
-    dnf list installed mongodb-org
+    dnf list installed | grep -i mongo
     if [ $? -ne 0 ]; then
         dnf install mongodb-org -y &>> $LOGS_FILE
         VALIDATE $? "Installing mongoDB server" 
@@ -223,6 +223,7 @@ RABBITMQ_SETUP(){
         echo -e "rabbitmq is already installed $Y SKIPPED $N" | tee -a $LOGS_FILE
     fi
 }
+
 JAVA_SETUP(){
     dnf install maven -y &>>$LOGS_FILE
     VALIDATE $? "Installing Maven"
