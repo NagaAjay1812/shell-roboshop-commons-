@@ -4,7 +4,7 @@ USERID=$(id -u)
 LOGS_FOLDER="/var/log/shell-roboshop-commons-"
 LOGS_FILE="/var/log/shell-roboshop-commons-/$0.log"
 SCRIPT_DIR=$PWD
-
+MYSQL_HOST=mysql.cloudkarna.in
 
 R="\e[31m"
 G="\e[32m"
@@ -123,6 +123,11 @@ SERVICE_RESTART_SETUP(){
     VALIDATE $? "Restart $APP_MODULE"
 }
 
+COPYING_SERVICE(){
+    cp $SCRIPT_DIR/$APP_MODULE.service /etc/systemd/system/$APP_MODULE.service &>> $LOGS_FILE
+    VALIDATE $? "copying the $APP_MODULE service and updated DNS record"   
+}
+
 MONGODB_SETUP(){
     dnf list installed mongodb-org
     if [ $? -ne 0 ]; then
@@ -131,4 +136,111 @@ MONGODB_SETUP(){
     else
         echo "mongoDB is already installed $Y SKIPPED $N"
     fi
+}
+
+MONGO_CLIENT_SETUP(){
+    dnf install mongodb-mongosh -y &>> $LOGS_FILE
+    VALIDATE $? "Installing mongoDB client"
+    mongosh --host mongodb.cloudkarna.in </app/db/master-data.js &>> $LOGS_FILE
+    VALIDATE $? "Load the data"
+    mongosh --host mongodb.cloudkarna.in &>> $LOGS_FILE
+    VALIDATE $? "Connect to mongodb"
+}
+
+NGINX_SETUP(){
+    dnf module list nginx &>> $LOGS_FILE
+    VALIDATE $? "Module list of nginx"
+
+    dnf module enable nginx:1.24 -y &>> $LOGS_FILE
+    VALIDATE $? "Enable nginx:24 version"
+
+    dnf list installed nginx &>> $LOGS_FILE
+    if [ $? -ne 0 ]; then
+        echo "nginx is  not installed, installing now" | tee -a $LOGS_FILE
+        dnf install nginx -y &>> $LOGS_FILE
+        VALIDATE $? "Installing nginx"
+    else
+        echo -e "nginx is already installed, $Y SKIPPING $N" | tee -a $LOGS_FILE
+    fi
+
+    
+
+}
+
+NGINX_APP_SETUP(){
+    rm -rf /usr/share/nginx/html/* 
+    VALIDATE $? "Remove the default html content"
+
+    curl -o /tmp/frontend.zip https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip
+    VALIDATE $? "Downloding code from s3 location"
+
+    cd /usr/share/nginx/html &>> $LOGS_FILE
+    VALIDATE $? "change directory to html"
+
+    unzip /tmp/frontend.zip &>> $LOGS_FILE 
+    VALIDATE $? "unzip the code"
+
+    cp $SCRIPT_DIR/nginx.conf /etc/nginx/nginx.conf
+    VALIDATE $? "copying the nginx conf and update DNS records"
+}
+
+REDIS_SETUP(){
+    dnf module disable redis -y &>> $LOGS_FILE
+    dnf module enable redis:7 -y &>> $LOGS_FILE
+    VALIDATE $? "Disable the default version of redis and enable the version:7 "
+
+    dnf list installed redis &>> $LOGS_FILE
+    if [ $? -ne 0 ]; then
+        dnf install redis -y  &>> $LOGS_FILE
+        VALIDATE $? "Installing redis server" 
+    else
+        echo -e "redis is already installed $Y SKIPPED $N" | tee -a $LOGS_FILE
+    fi
+}
+    
+MYSQL_SETUP(){
+    dnf list installed mysql-server &>> $LOGS_FILE
+    if [ $? -ne 0 ]; then
+        dnf install mysql-server -y  &>> $LOGS_FILE
+        VALIDATE $? "Installing mysql server" 
+    else
+        echo -e "mysql is already installed $Y SKIPPED $N" | tee -a $LOGS_FILE
+    fi
+
+}
+
+MYSQL_PSWD_SETUP(){
+    mysql_secure_installation --set-root-pass RoboShop@1 &>> $LOGS_FILE
+    VALIDATE $? "Updated the root password"
+}
+
+RABBITMQ_SETUP(){
+    dnf list installed rabbitmq-server &>> $LOGS_FILE
+    if [ $? -ne 0 ]; then
+        dnf install rabbitmq-server -y  &>> $LOGS_FILE
+        VALIDATE $? "Installing rabbitmq server" 
+    else
+        echo -e "rabbitmq is already installed $Y SKIPPED $N" | tee -a $LOGS_FILE
+    fi
+}
+JAVA_SETUP(){
+    dnf install maven -y &>>$LOGS_FILE
+    VALIDATE $? "Installing Maven"
+
+    cd /app 
+    mvn clean package &>>$LOGS_FILE
+    VALIDATE $? "Installing and Building $APP_MODULE"
+
+    mv target/$APP_MODULE-1.0.jar $APP_MODULE.jar 
+    VALIDATE $? "Moving and Renaming $APP_MODULE"
+}
+
+
+PYTHON_SETUP(){
+    dnf install python3 gcc python3-devel -y &>>$LOGS_FILE
+    VALIDATE $? "Installing Python"
+
+    cd /app 
+    pip3 install -r requirements.txt &>>$LOGS_FILE
+    VALIDATE $? "Installing dependencies"
 }
