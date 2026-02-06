@@ -36,7 +36,7 @@ END_TIMER() {
 
 ROOT_ACCESS(){
     if [ $USERID -ne 0 ]; then
-        echo "$R please run the script with root user access. $N" | tee -a $LOGS_FILE
+        echo -e "$R please run the script with root user access. $N" | tee -a $LOGS_FILE
         exit 1
     fi
 }
