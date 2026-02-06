@@ -143,8 +143,7 @@ MONGO_CLIENT_SETUP(){
     VALIDATE $? "Installing mongoDB client"
     mongosh --host mongodb.cloudkarna.in </app/db/master-data.js &>> $LOGS_FILE
     VALIDATE $? "Load the data"
-    mongosh --host mongodb.cloudkarna.in &>> $LOGS_FILE
-    VALIDATE $? "Connect to mongodb"
+    
 }
 
 NGINX_SETUP(){
