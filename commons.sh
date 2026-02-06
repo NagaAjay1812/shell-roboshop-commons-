@@ -13,6 +13,27 @@ N="\e[0m"
 
 mkdir -p $LOGS_FOLDER
 
+TIMESTAMP() {
+    date +"%Y-%m-%d %H:%M:%S"
+}
+
+LOG() {
+  # Usage: LOG "message"
+  echo -e "$(TIMESTAMP) :: $1" | tee -a "$LOGS_FILE"
+}
+
+START_TIMER() {
+  SCRIPT_START_TIME=$(date +%s)
+  LOG "Script started"
+}
+
+END_TIMER() {
+  SCRIPT_END_TIME=$(date +%s)
+  TOTAL_TIME=$((SCRIPT_END_TIME - SCRIPT_START_TIME))
+  LOG "Script completed"
+  LOG "Total execution time: ${TOTAL_TIME} seconds"
+}
+
 ROOT_ACCESS(){
     if [ $USERID -ne 0 ]; then
         echo "$R please run the script with root user access. $N" | tee -a $LOGS_FILE
@@ -24,10 +45,10 @@ ROOT_ACCESS(){
 
 VALIDATE(){ 
     if [ $1 -ne 0 ]; then
-        echo -e "$2.....$R Failure $N" | tee -a $LOGS_FILE
+        echo -e "$(TIMESTAMP) :: $2.....$R Failure $N" | tee -a $LOGS_FILE
         exit 1
     else
-        echo -e "$2.....$G Success $N" | tee -a $LOGS_FILE
+        echo -e "$(TIMESTAMP) :: $2.....$G Success $N" | tee -a $LOGS_FILE
     fi
 }
 
