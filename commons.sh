@@ -130,5 +130,5 @@ MONGODB_SETUP(){
         VALIDATE $? "Installing mongoDB server" 
     else
         echo "mongoDB is already installed $Y SKIPPED $N"
-fi
+    fi
 }
