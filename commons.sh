@@ -106,12 +106,29 @@ DEPENDENCY_SETUP(){
     VALIDATE $? "read form index.json and installing depenencies using npm build tool"
 
 }
-
-SERVICE_SETUP(){
+DAEMON_RELOAD_SETUP(){
     systemctl daemon-reload &>> $LOGS_FILE
     VALIDATE $? "daemon-reloaded"
+}
 
+SERVICE_SETUP(){
+    
     systemctl enable $APP_MODULE &>> $LOGS_FILE
     systemctl start $APP_MODULE &>> $LOGS_FILE
     VALIDATE $? "Enable and start the $APP_MODULE service"
+}
+
+SERVICE_RESTART_SETUP(){
+    systemctl restart $APP_MODULE &>> $LOGS_FILE
+    VALIDATE $? "Restart $APP_MODULE"
+}
+
+MONGODB_SETUP(){
+    dnf list installed mongodb-org
+    if [ $? -ne 0 ]; then
+        dnf install mongodb-org -y &>> $LOGS_FILE
+        VALIDATE $? "Installing mongoDB server" 
+    else
+        echo "mongoDB is already installed $Y SKIPPED $N"
+fi
 }
