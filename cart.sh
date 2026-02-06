@@ -1,6 +1,9 @@
 source ./commons.sh
-APP_MODULE=cart
+
 ROOT_ACCESS
+APP_MODULE=cart
+
+
 
 VALIDATE
 NODEJS_SETUP
