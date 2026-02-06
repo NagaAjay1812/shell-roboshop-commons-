@@ -1,6 +1,8 @@
 source ./commons.sh
 
+
 ROOT_ACCESS
+START_TIMER
 APP_MODULE=cart
 
 
@@ -10,7 +12,8 @@ APP_SETUP
 
 DEPENDENCY_SETUP
 
-cp $SCRIPT_DIR/cart.service /etc/systemd/system/cart.service &>> $LOGS_FILE
-VALIDATE $? "copying the cart service and updated mongodb DNS record"
+COPYING_SERVICE
 
 SERVICE_SETUP
+
+END_TIMER
